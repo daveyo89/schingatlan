@@ -112,6 +112,7 @@ class Property(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     street = models.CharField(max_length=120, blank=True)
     city = models.ForeignKey(City, on_delete=models.DO_NOTHING, blank=True, null=True)
+    image = CloudinaryField('image', blank=True, null=True)
 
     date = models.DateField(auto_now=True)
 
