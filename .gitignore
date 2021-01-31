@@ -1,0 +1,6 @@
+.env
+.idea
+media/tinymce/js
+
+
+**.pyc

@@ -1,0 +1,54 @@
+{% load cloudinary %}
+{% load static %}
+
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Ingatlan oldal.">
+    <meta name="author" content="Dave Yo">
+
+    <title>Schingatlan</title>
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'House/css/base.css' %}">
+    {% block extra_head %}
+    {% endblock %}
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark sticky-top bg-dark">
+    <a class="navbar-brand" href="{% url 'index' %}">{{ request.META.HTTP_HOST }}</a>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'index' %}">House</a>
+            </li>
+        </ul>
+        <form method="GET" action="{% url 'search' %}" class="form-inline my-2 my-lg-0">
+            {% csrf_token %}
+            <input name="query" class="form-control mr-sm-2" type="text" placeholder="Search"
+                   aria-label="Search">
+            {% buttons submit='Go' %}{% endbuttons %}
+        </form>
+    </div>
+</nav>
+<hr>
+
+<main role="main">
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</main>
+<hr>
+</body>
+{% include 'House/footer.html' %}
+</html>
