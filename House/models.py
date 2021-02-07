@@ -5,6 +5,8 @@ from django.contrib.gis.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from tinymce import models as tinymce_models
+from taggit.managers import TaggableManager
+from taggit.models import Tag
 
 
 class City(models.Model):
@@ -25,6 +27,25 @@ class City(models.Model):
         verbose_name_plural = "Cities"
 
 
+class CityPart(models.Model):
+    name = models.CharField(max_length=60)
+    slug = models.CharField(max_length=60, unique=True, blank=True)
+    city = models.ForeignKey(City, on_delete=models.DO_NOTHING, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save()
+
+    def get_absolute_url(self, *args, **kwargs):
+        return reverse('city-part', kwargs={'slug': self.slug})
+
+    class Meta:
+        verbose_name_plural = "City parts"
+
+
 class Data(models.Model):
     allapot = [
         ('uj', 'uj'),
@@ -42,6 +63,7 @@ class Data(models.Model):
         ('K', 'K'),
         ('NY', 'NY')
     ]
+    cim = models.CharField(max_length=120, blank=True, default='')
     ingatlan_allapota = models.CharField(max_length=50, choices=allapot, blank=True, null=True)
     epites_eve = models.CharField(max_length=50, blank=True, null=True)
     komfort = models.CharField(max_length=50, blank=True, null=True)
@@ -68,33 +90,62 @@ class Data(models.Model):
     gaz = models.BooleanField(blank=True, null=True)
     csatorna = models.BooleanField(blank=True, null=True)
     telek_besorolas = models.CharField(max_length=50, blank=True, null=True)
+    meret = models.PositiveIntegerField(blank=True, null=True)
+    telek_meret = models.PositiveIntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.cim
 
 
 class Category(models.Model):
     """
-    Ház, lakás vagy telek például.
+    Eladó, kiadó
     """
     statuses = [
-        ('E', 'Eladó'),
-        ('K', 'Kiadó')
+        ('Eladó', 'Eladó'),
+        ('Kiadó', 'Kiadó')
     ]
-    name = models.CharField(max_length=50)
-    description = models.CharField(max_length=255)
     slug = models.CharField(max_length=60, unique=True, blank=True)
-    status = models.CharField(max_length=1, choices=statuses)
+    status = models.CharField(max_length=20, choices=statuses)
 
     def __str__(self):
-        return self.name
+        return self.status
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        self.slug = slugify(self.status)
         return super().save()
 
     def get_absolute_url(self, *args, **kwargs):
-        return reverse('category', kwargs={'slug': self.slug})
+        return reverse('category', kwargs={'slug': self.status})
 
     class Meta:
         verbose_name_plural = "Categories"
+
+
+class Types(models.Model):
+    """
+    Ház, lakás vagy telek például.
+    """
+    statuses = [
+        ('Ház', 'Ház'),
+        ('Lakás', 'Lakás'),
+        ('Telek', 'Telek')
+    ]
+    slug = models.CharField(max_length=60, unique=True, blank=True)
+    status = models.CharField(max_length=20, choices=statuses)
+
+    def __str__(self):
+        return self.status
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.status)
+        return super().save()
+
+    def get_absolute_url(self, *args, **kwargs):
+        return reverse('types', kwargs={'slug': self.slug})
+
+    class Meta:
+        verbose_name_plural = "Types"
 
 
 class Property(models.Model):
@@ -103,24 +154,25 @@ class Property(models.Model):
         ('I', 'InActive'),
         ('S', 'Sold')
     ]
-    title = models.CharField(max_length=120, blank=True)
+    street = models.CharField(max_length=120, blank=True)
     description = tinymce_models.HTMLField()
     slug = models.CharField(max_length=60, unique=True, blank=True)
     data = models.OneToOneField(Data, on_delete=models.CASCADE, primary_key=False, blank=True, editable=True)
     status = models.CharField(max_length=1, choices=statuses)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    street = models.CharField(max_length=120, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING,  blank=True, null=True)
+    types = models.ForeignKey(Types, on_delete=models.DO_NOTHING, blank=True, null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=User)
     city = models.ForeignKey(City, on_delete=models.DO_NOTHING, blank=True, null=True)
+    city_part = models.ForeignKey(CityPart, on_delete=models.DO_NOTHING, blank=True, null=True)
     image = CloudinaryField('image', blank=True, null=True)
-
+    tags = TaggableManager(verbose_name='Tags', blank=True)
     date = models.DateField(auto_now=True)
 
     def __str__(self):
-        return self.title
+        return self.data.cim + ". " + str(self.data.meret) + "nm"
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
+        self.slug = slugify(self.street)
         return super().save()
 
     def get_absolute_url(self, *args, **kwargs):

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'House.apps.HouseConfig',
     'tinymce',
+    'taggit',
     'django.contrib.admin',
 ]
 

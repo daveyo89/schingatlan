@@ -31,12 +31,6 @@
                     <a class="nav-link" href="{% url 'index' %}">House</a>
                 </li>
             </ul>
-            <form method="GET" action="{% url 'search' %}" class="form-inline my-2 my-lg-0">
-                {% csrf_token %}
-                <input name="query" class="form-control mr-sm-2" type="text" placeholder="Search"
-                       aria-label="Search">
-                {% buttons submit='Go' %}{% endbuttons %}
-            </form>
         </div>
     </nav>
 </div>
