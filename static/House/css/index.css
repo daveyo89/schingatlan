@@ -42,3 +42,10 @@ body {
         background: #1A4668;
     }
 }
+
+.ar_max {
+    border-left: none;
+}
+.ar_min {
+    border-right: none;
+}

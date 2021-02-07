@@ -1,0 +1,48 @@
+<section class="search-sec">
+    <form method="GET" action="{% url 'search' %}" novalidate="novalidate">
+        {% csrf_token %}
+        <div class="col-lg-12">
+            <div class="row justify-content-center">
+                <div class="btn-group btn-group-toggle p-1 radio-item" data-toggle="buttons">
+                    {% for category in categories %}
+                        <label class="btn btn-success" for="{{ category.status }}">
+                            <input type="radio" name="categories"
+                                   value="{{ category.status }}" autocomplete="off"
+                            >{{ category.status }}
+                        </label>
+                    {% endfor %}
+                </div>
+                <div class="col-md-1 p-0">
+                    <select name="types" class="form-control search-slt" id="type">
+                        {% for type in types %}
+                            <option>{{ type.status }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-1 p-0">
+                    <select name="cities" class="form-control search-slt" id="cities">
+                        <option value="">Város</option>
+                        {% for city in cites %}
+                            <option>{{ city.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-1 p-0">
+                    <input name="min" type="text" class="form-control search-slt" placeholder="min">
+                </div>
+                <div class="col-md-1 p-0">
+                    <input name="max" type="text" class="form-control search-slt" placeholder="max">
+                </div>
+                <div class="col-md-1 p-0">
+                    <input name="ar_min" type="text" class="form-control search-slt ar_min" placeholder="ár min">
+                </div>
+                <div class="col-md-1 p-0 ">
+                    <input name="ar_max" type="text" class="form-control search-slt ar_max" placeholder="ár max">
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12 p-0">
+                    <button type="submit" class="btn btn-danger wrn-btn">Search</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
